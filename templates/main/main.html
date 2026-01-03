@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row" style="min-height: 70vh;">
+  <!-- Left: Video -->
+  <div class="col-md-6 d-flex align-items-center justify-content-center">
+    <div class="glass-card w-100 d-flex align-items-center justify-content-center p-4 position-relative" style="min-height: 350px;">
+      <video id="preview-video" class="video-fit" controls loop style="display: none;">
+        <source id="preview-source" src="" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div class="text-center w-100" id="no-video-placeholder">
+        <span class="text-secondary">No video selected</span>
+      </div>
+      {% if video_url %}
+        <video id="uploaded-video" class="video-fit" controls loop autoplay>
+          <source src="{{ video_url }}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      {% endif %}
+    </div>
+  </div>
+  <!-- Right: Form and Output -->
+  <div class="col-md-6 d-flex flex-column justify-content-center align-items-center">
+    <div class="glass-card w-100 d-flex flex-column align-items-center p-4" style="min-height: 350px;">
+      <form method="post" enctype="multipart/form-data" class="w-75 mb-4" id="detect-form">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="video" class="form-label">Upload Video File</label>
+          <input type="file" class="form-control" id="video" name="video" accept="video/*" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Detect</button>
+      </form>
+      <div id="loader" class="w-75 mt-3 text-center" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="mt-2 text-secondary">Detecting...</div>
+      </div>
+      {% if result %}
+        <div class="alert alert-info text-center w-75 mt-3" id="result-area">
+          <strong>Result:</strong> {{ result }}<br>
+          <strong>Confidence:</strong> {{ confidence|floatformat:2 }}
+        </div>
+      {% else %}
+        <div id="result-area"></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.getElementById('video');
+  const previewVideo = document.getElementById('preview-video');
+  const previewSource = document.getElementById('preview-source');
+  const placeholder = document.getElementById('no-video-placeholder');
+  const form = document.getElementById('detect-form');
+  const loader = document.getElementById('loader');
+  const resultArea = document.getElementById('result-area');
+
+  // Reset file input and preview on page load
+  if (fileInput) fileInput.value = '';
+  if (previewVideo) previewVideo.style.display = 'none';
+  if (placeholder) placeholder.style.display = 'block';
+
+  if (fileInput) {
+    fileInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        previewSource.src = url;
+        previewVideo.load();
+        previewVideo.style.display = 'block';
+        if (placeholder) placeholder.style.display = 'none';
+      } else {
+        previewVideo.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'block';
+      }
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', function() {
+      if (loader) loader.style.display = 'block';
+      if (resultArea) resultArea.style.display = 'none';
+    });
+  }
+});
+</script>
+{% endblock %}

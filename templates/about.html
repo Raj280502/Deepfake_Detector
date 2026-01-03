@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About - DeepFake Detector{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row align-items-center py-5">
+        <div class="col-lg-6" data-aos="fade-right">
+            <span class="badge bg-primary bg-opacity-25 text-primary-emphasis px-3 py-2 rounded-pill mb-3">
+                <i class="bi bi-info-circle me-1"></i>About Us
+            </span>
+            <h1 class="display-5 fw-bold mb-4">
+                Fighting <span class="text-gradient">Misinformation</span><br>
+                with AI
+            </h1>
+            <p class="lead text-muted mb-4">
+                DeepFake Detector is an AI-powered tool designed to help identify manipulated media content. 
+                Using state-of-the-art deep learning models, we analyze videos and images to detect 
+                signs of synthetic generation or manipulation.
+            </p>
+            <div class="d-flex gap-3">
+                <a href="{% url 'detect' %}" class="btn btn-gradient">
+                    <i class="bi bi-play-circle me-2"></i>Try It Now
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+            <div class="glass-card text-center">
+                <i class="bi bi-shield-check display-1 text-gradient mb-4"></i>
+                <h4>Xception Neural Network</h4>
+                <p class="text-muted">
+                    Our detection system uses the Xception architecture, a powerful deep learning model 
+                    trained on extensive deepfake datasets for high-accuracy detection.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Section -->
+    <section class="py-5">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-6 fw-bold mb-3">Our <span class="text-gradient-2">Technology</span></h2>
+            <p class="text-muted lead">Built on cutting-edge AI and machine learning</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="glass-card h-100">
+                    <div class="feature-icon mb-4">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h5 class="mb-3">Xception Model</h5>
+                    <p class="text-muted">
+                        Extreme Inception architecture with depthwise separable convolutions, 
+                        specifically fine-tuned for deepfake detection with exceptional accuracy.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="glass-card h-100">
+                    <div class="feature-icon mb-4" style="background: var(--gradient-2);">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <h5 class="mb-3">Frame Analysis</h5>
+                    <p class="text-muted">
+                        Videos are analyzed frame-by-frame, extracting key frames at regular intervals 
+                        to detect inconsistencies that indicate manipulation.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="glass-card h-100">
+                    <div class="feature-icon mb-4" style="background: var(--gradient-3);">
+                        <i class="bi bi-bar-chart-line"></i>
+                    </div>
+                    <h5 class="mb-3">Confidence Scoring</h5>
+                    <p class="text-muted">
+                        Results include confidence scores that indicate how certain the model is 
+                        about its prediction, helping you make informed decisions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How Deepfakes Work -->
+    <section class="py-5">
+        <div class="glass-card" data-aos="fade-up">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h3 class="mb-4">What are <span class="text-gradient">DeepFakes</span>?</h3>
+                    <p class="text-muted mb-4">
+                        DeepFakes are synthetic media created using deep learning techniques, 
+                        typically involving face swapping or face generation. These manipulated 
+                        videos and images can be used for:
+                    </p>
+                    <ul class="text-muted mb-4">
+                        <li class="mb-2">Spreading misinformation and fake news</li>
+                        <li class="mb-2">Identity theft and fraud</li>
+                        <li class="mb-2">Harassment and reputation damage</li>
+                        <li>Political manipulation</li>
+                    </ul>
+                    <p class="text-muted">
+                        Our tool helps identify these manipulations by analyzing subtle artifacts 
+                        and inconsistencies that deep learning models leave behind.
+                    </p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="result-card real text-center p-4">
+                                <i class="bi bi-check-circle-fill text-success display-5 mb-3"></i>
+                                <h6>Real Media</h6>
+                                <small class="text-muted">Original, unmanipulated</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="result-card fake text-center p-4">
+                                <i class="bi bi-x-circle-fill text-danger display-5 mb-3"></i>
+                                <h6>Fake Media</h6>
+                                <small class="text-muted">AI-generated or manipulated</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="py-5">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-6 fw-bold mb-3">Built With</h2>
+            <p class="text-muted lead">Modern technologies for reliable performance</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in" data-aos-delay="0">
+                <div class="glass-card text-center py-4">
+                    <i class="bi bi-filetype-py display-5 text-gradient mb-3"></i>
+                    <h6 class="mb-0">Python</h6>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in" data-aos-delay="50">
+                <div class="glass-card text-center py-4">
+                    <i class="bi bi-server display-5 text-gradient mb-3"></i>
+                    <h6 class="mb-0">Django</h6>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in" data-aos-delay="100">
+                <div class="glass-card text-center py-4">
+                    <i class="bi bi-gpu-card display-5 text-gradient mb-3"></i>
+                    <h6 class="mb-0">PyTorch</h6>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in" data-aos-delay="150">
+                <div class="glass-card text-center py-4">
+                    <i class="bi bi-camera-reels display-5 text-gradient mb-3"></i>
+                    <h6 class="mb-0">OpenCV</h6>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in" data-aos-delay="200">
+                <div class="glass-card text-center py-4">
+                    <i class="bi bi-bootstrap display-5 text-gradient mb-3"></i>
+                    <h6 class="mb-0">Bootstrap</h6>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disclaimer -->
+    <section class="py-5">
+        <div class="glass-card text-center" data-aos="fade-up" style="border-color: var(--warning);">
+            <i class="bi bi-exclamation-triangle text-warning display-5 mb-3"></i>
+            <h4 class="mb-3">Important Disclaimer</h4>
+            <p class="text-muted mb-0 mx-auto" style="max-width: 600px;">
+                While our AI model achieves high accuracy, no detection system is 100% perfect. 
+                Results should be used as one factor in your assessment of media authenticity. 
+                Always verify important content through multiple sources.
+            </p>
+        </div>
+    </section>
+</div>
+{% endblock %}

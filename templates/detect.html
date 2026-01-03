@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detect DeepFakes - Upload Media{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-search text-gradient me-3"></i>Detect DeepFakes
+                </h1>
+                <p class="text-muted lead">Upload a video or image to analyze for manipulations</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Left Column - Upload & Preview -->
+                <div class="col-lg-7" data-aos="fade-right">
+                    <div class="glass-card h-100">
+                        <!-- Tabs for Video/Image -->
+                        <ul class="nav nav-tabs-custom mb-4" id="mediaTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="video-tab" data-bs-toggle="tab" data-bs-target="#video-panel" type="button">
+                                    <i class="bi bi-camera-video me-2"></i>Video
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-panel" type="button">
+                                    <i class="bi bi-image me-2"></i>Image
+                                </button>
+                            </li>
+                        </ul>
+
+                        <form method="post" enctype="multipart/form-data" id="detect-form">
+                            {% csrf_token %}
+                            
+                            <div class="tab-content">
+                                <!-- Video Upload -->
+                                <div class="tab-pane fade show active" id="video-panel" role="tabpanel">
+                                    <input type="hidden" name="media_type" value="video" id="media-type-input">
+                                    
+                                    <div class="upload-zone" id="video-drop-zone">
+                                        <input type="file" class="d-none" id="video-input" name="video" accept="video/*">
+                                        <div class="upload-icon">
+                                            <i class="bi bi-cloud-arrow-up"></i>
+                                        </div>
+                                        <h5 class="mb-2">Drag & drop your video here</h5>
+                                        <p class="text-muted mb-3">or click to browse</p>
+                                        <span class="badge bg-secondary">MP4, AVI, MOV, MKV • Max 100MB</span>
+                                    </div>
+                                </div>
+
+                                <!-- Image Upload -->
+                                <div class="tab-pane fade" id="image-panel" role="tabpanel">
+                                    <div class="upload-zone" id="image-drop-zone">
+                                        <input type="file" class="d-none" id="image-input" name="image" accept="image/*">
+                                        <div class="upload-icon" style="background: var(--gradient-2);">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                        <h5 class="mb-2">Drag & drop your image here</h5>
+                                        <p class="text-muted mb-3">or click to browse</p>
+                                        <span class="badge bg-secondary">JPG, PNG, WEBP • Max 10MB</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preview Area -->
+                            <div class="preview-container mt-4" id="preview-area" style="display: none;">
+                                <video id="video-preview" controls class="w-100" style="display: none;">
+                                    <source src="" type="video/mp4">
+                                </video>
+                                <img id="image-preview" class="img-fluid" style="display: none;">
+                                <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2" id="clear-preview">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-gradient w-100 mt-4" id="submit-btn" disabled>
+                                <i class="bi bi-cpu me-2"></i>Analyze Media
+                            </button>
+                        </form>
+
+                        <!-- Loader -->
+                        <div class="loader-container" id="loader">
+                            <div class="loader"></div>
+                            <h5 class="loader-text">Analyzing your media<span>.</span><span>.</span><span>.</span></h5>
+                            <p class="text-muted mt-2">This may take a few moments</p>
+                            <div class="progress mt-3" style="height: 6px; background: var(--dark-border);">
+                                <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Results -->
+                <div class="col-lg-5" data-aos="fade-left">
+                    <div class="glass-card h-100">
+                        <h5 class="mb-4">
+                            <i class="bi bi-clipboard-data me-2 text-gradient"></i>Analysis Results
+                        </h5>
+
+                        {% if result %}
+                            <!-- Result Display -->
+                            <div class="result-card {% if result == 'Real' %}real{% else %}fake{% endif %} mb-4" data-aos="zoom-in">
+                                <div class="mb-3">
+                                    {% if result == 'Real' %}
+                                        <i class="bi bi-check-circle-fill text-success display-4"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle-fill text-danger display-4"></i>
+                                    {% endif %}
+                                </div>
+                                <span class="result-badge {% if result == 'Real' %}real{% else %}fake{% endif %}">
+                                    {% if result == 'Real' %}
+                                        <i class="bi bi-shield-check"></i>
+                                    {% else %}
+                                        <i class="bi bi-shield-exclamation"></i>
+                                    {% endif %}
+                                    {{ result }}
+                                </span>
+                            </div>
+
+                            {% if result == 'Real' %}
+                            <!-- Confidence Gauge -->
+                            <div class="text-center mb-4">
+                                <div class="progress-ring">
+                                    <svg viewBox="0 0 140 140">
+                                        <circle class="bg" cx="70" cy="70" r="65"></circle>
+                                        <circle class="progress" cx="70" cy="70" r="65" style="stroke: var(--success); stroke-dashoffset: calc(408 * (1 - {{ confidence }}/100));"></circle>
+                                    </svg>
+                                    <div class="value">{{ confidence }}%</div>
+                                </div>
+                                <p class="text-muted mt-2">Confidence Score</p>
+                            </div>
+                            {% else %}
+                            <!-- Confidence Gauge -->
+                            <div class="text-center mb-4">
+                                <div class="progress-ring">
+                                    <svg viewBox="0 0 140 140">
+                                        <circle class="bg" cx="70" cy="70" r="65"></circle>
+                                        <circle class="progress" cx="70" cy="70" r="65" style="stroke: var(--danger); stroke-dashoffset: calc(408 * (1 - {{ confidence }}/100));"></circle>
+                                    </svg>
+                                    <div class="value">{{ confidence }}%</div>
+                                </div>
+                                <p class="text-muted mt-2">Confidence Score</p>
+                            </div>
+                            {% endif %}
+
+                            <!-- Stats -->
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-value">{{ frames_analyzed|default:"N/A" }}</div>
+                                    <div class="stat-label">Frames Analyzed</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">{{ processing_time|default:"N/A" }}</div>
+                                    <div class="stat-label">Processing Time</div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-flex gap-2 mt-4">
+                                <a href="{% url 'detect' %}" class="btn btn-outline-glass flex-grow-1">
+                                    <i class="bi bi-arrow-repeat me-2"></i>New Analysis
+                                </a>
+                                <a href="{% url 'history' %}" class="btn btn-outline-glass">
+                                    <i class="bi bi-clock-history"></i>
+                                </a>
+                            </div>
+
+                        {% elif error %}
+                            <!-- Error Display -->
+                            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                                <div>{{ error }}</div>
+                            </div>
+                            <a href="{% url 'detect' %}" class="btn btn-outline-glass w-100">
+                                <i class="bi bi-arrow-repeat me-2"></i>Try Again
+                            </a>
+
+                        {% else %}
+                            <!-- Empty State -->
+                            <div class="text-center py-5">
+                                <div class="rounded-circle bg-dark d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                                    <i class="bi bi-graph-up text-muted display-5"></i>
+                                </div>
+                                <h6 class="text-muted">No Results Yet</h6>
+                                <p class="text-muted small">Upload a video or image to see the analysis results here</p>
+                            </div>
+
+                            <!-- Tips -->
+                            <div class="mt-4 p-3 rounded-3" style="background: var(--dark-card);">
+                                <h6 class="mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>Tips for best results</h6>
+                                <ul class="text-muted small mb-0 ps-3">
+                                    <li class="mb-2">Use high-quality media files</li>
+                                    <li class="mb-2">Ensure faces are clearly visible</li>
+                                    <li class="mb-2">Avoid heavily compressed files</li>
+                                    <li>Good lighting improves accuracy</li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('detect-form');
+    const videoInput = document.getElementById('video-input');
+    const imageInput = document.getElementById('image-input');
+    const videoDropZone = document.getElementById('video-drop-zone');
+    const imageDropZone = document.getElementById('image-drop-zone');
+    const videoPreview = document.getElementById('video-preview');
+    const imagePreview = document.getElementById('image-preview');
+    const previewArea = document.getElementById('preview-area');
+    const clearPreview = document.getElementById('clear-preview');
+    const submitBtn = document.getElementById('submit-btn');
+    const loader = document.getElementById('loader');
+    const mediaTypeInput = document.getElementById('media-type-input');
+    
+    let currentMediaType = 'video';
+
+    // Tab switching
+    document.getElementById('video-tab').addEventListener('click', function() {
+        currentMediaType = 'video';
+        mediaTypeInput.value = 'video';
+        clearAllPreviews();
+    });
+
+    document.getElementById('image-tab').addEventListener('click', function() {
+        currentMediaType = 'image';
+        mediaTypeInput.value = 'image';
+        clearAllPreviews();
+    });
+
+    // Click to upload
+    videoDropZone.addEventListener('click', () => videoInput.click());
+    imageDropZone.addEventListener('click', () => imageInput.click());
+
+    // Drag and drop
+    function setupDropZone(zone, input) {
+        zone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            zone.classList.add('drag-over');
+        });
+
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('drag-over');
+        });
+
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                input.files = files;
+                handleFileSelect(input);
+            }
+        });
+    }
+
+    setupDropZone(videoDropZone, videoInput);
+    setupDropZone(imageDropZone, imageInput);
+
+    // File selection handlers
+    videoInput.addEventListener('change', () => handleFileSelect(videoInput));
+    imageInput.addEventListener('change', () => handleFileSelect(imageInput));
+
+    function handleFileSelect(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        previewArea.style.display = 'block';
+        submitBtn.disabled = false;
+
+        if (input === videoInput) {
+            const url = URL.createObjectURL(file);
+            videoPreview.querySelector('source').src = url;
+            videoPreview.load();
+            videoPreview.style.display = 'block';
+            imagePreview.style.display = 'none';
+            videoDropZone.style.display = 'none';
+        } else {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                videoPreview.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+            imageDropZone.style.display = 'none';
+        }
+    }
+
+    function clearAllPreviews() {
+        previewArea.style.display = 'none';
+        videoPreview.style.display = 'none';
+        imagePreview.style.display = 'none';
+        videoDropZone.style.display = 'block';
+        imageDropZone.style.display = 'block';
+        videoInput.value = '';
+        imageInput.value = '';
+        submitBtn.disabled = true;
+    }
+
+    clearPreview.addEventListener('click', clearAllPreviews);
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        loader.classList.add('active');
+        submitBtn.disabled = true;
+        
+        // Animate progress bar
+        const progressBar = loader.querySelector('.progress-bar');
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            progressBar.style.width = progress + '%';
+        }, 500);
+    });
+});
+</script>
+{% endblock %}
